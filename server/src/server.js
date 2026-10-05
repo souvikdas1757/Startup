@@ -27,10 +27,15 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false, // Allow serving uploads to frontend
+}));
 
-// FIX: Allow requests from any localhost port during development
-app.use(cors({ origin: true, credentials: true }));
+// CORS - Allow all origins (safe since frontend & backend share domain on Vercel)
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -42,6 +47,15 @@ const limiter = rateLimit({
   max: 100, // Limit each IP to 100 requests per windowMs
 });
 app.use('/api', limiter);
+
+// Health Check Route
+app.get('/', (req, res) => {
+  res.json({ success: true, message: 'NEXORA API is running' });
+});
+
+app.get('/api', (req, res) => {
+  res.json({ success: true, message: 'NEXORA API is running' });
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -62,6 +76,12 @@ app.use((err, req, res, next) => {
   res.status(status).json({ success: false, message });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Only start the server locally (Vercel handles it in production)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+// Export for Vercel serverless function
+export default app;
