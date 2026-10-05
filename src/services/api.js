@@ -1,20 +1,14 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
-  withCredentials: true, // Important for cookies
-});
+// In production (Vercel), use relative path "/api" so it hits the same domain.
+// In local development, use the local backend URL.
+const baseURL = import.meta.env.PROD 
+  ? '/api' 
+  : 'http://localhost:5000/api';
 
-// Add a response interceptor to handle 401 Unauthorized globally
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      // Clear user state and redirect to login if needed
-      // window.location.href = '/login'; 
-    }
-    return Promise.reject(error);
-  }
-);
+const api = axios.create({
+  baseURL,
+  withCredentials: true,
+});
 
 export default api;
