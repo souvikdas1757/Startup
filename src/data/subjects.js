@@ -1,0 +1,8 @@
+export const subjectsSeed = [
+  { id: 'ds', name: 'Data Structures', code: 'CS201', teacher: 'Dr. Anil Sharma', semester: 3, branch: 'Computer Science', section: 'A', notes: 24, assignments: 6, description: 'Arrays, linked lists, stacks, queues, trees, graphs, and algorithm analysis.' },
+  { id: 'dbms', name: 'Database Management System', code: 'CS202', teacher: 'Prof. Meera Nair', semester: 3, branch: 'Computer Science', section: 'A', notes: 18, assignments: 4, description: 'Relational model, SQL, normalization, transactions and indexing.' },
+  { id: 'os', name: 'Operating Systems', code: 'CS203', teacher: 'Dr. Rakesh Verma', semester: 3, branch: 'Computer Science', section: 'A', notes: 21, assignments: 5, description: 'Processes, scheduling, memory management, file systems and concurrency.' },
+  { id: 'cn', name: 'Computer Networks', code: 'CS204', teacher: 'Prof. Sneha Iyer', semester: 3, branch: 'Computer Science', section: 'A', notes: 16, assignments: 3, description: 'OSI & TCP/IP models, routing, transport protocols and security.' },
+  { id: 'java', name: 'Java Programming', code: 'CS205', teacher: 'Dr. Kiran Rao', semester: 3, branch: 'Computer Science', section: 'A', notes: 22, assignments: 7, description: 'OOP concepts, collections, generics, multithreading and JDBC.' },
+  { id: 'math', name: 'Mathematics III', code: 'MA301', teacher: 'Prof. Divya Menon', semester: 3, branch: 'Computer Science', section: 'A', notes: 14, assignments: 4, description: 'Vector calculus, differential equations, Laplace and Fourier transforms.' }
+]

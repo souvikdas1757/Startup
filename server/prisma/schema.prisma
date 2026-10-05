@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum Priority {
+  NORMAL
+  IMPORTANT
+  URGENT
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  role         Role     @default(STUDENT)
+  branch       String?
+  semester     Int?
+  section      String?
+  profileImage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  notes         Note[]
+  assignments   Assignment[]
+  submissions   Submission[]
+  bookmarks     Bookmark[]
+  announcements Announcement[]
+}
+
+model Subject {
+  id          String   @id @default(uuid())
+  name        String
+  code        String   @unique
+  description String?
+  semester    Int
+  branch      String
+  section     String
+  teacher     String
+  thumbnail   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  notes         Note[]
+  assignments   Assignment[]
+  announcements Announcement[]
+}
+
+model Note {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  fileUrl     String
+  fileName    String
+  fileType    String
+  fileSize    String
+  downloads   Int      @default(0)
+  views       Int      @default(0)
+  subjectId   String
+  uploadedBy  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subject   Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  uploader  User       @relation(fields: [uploadedBy], references: [id])
+  bookmarks Bookmark[]
+}
+
+model Assignment {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  attachment  String?
+  dueDate     DateTime
+  subjectId   String
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subject     Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  creator     User         @relation(fields: [createdBy], references: [id])
+  submissions Submission[]
+}
+
+model Submission {
+  id           String   @id @default(uuid())
+  assignmentId String
+  studentId    String
+  fileUrl      String
+  submittedAt  DateTime @default(now())
+  status       String   @default("SUBMITTED")
+  feedback     String?
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User       @relation(fields: [studentId], references: [id])
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  priority  Priority @default(NORMAL)
+  subjectId String?
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  creator User     @relation(fields: [createdBy], references: [id])
+}
+
+model Documentation {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String   @unique
+  category  String
+  language  String
+  content   Json
+  author    String
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookmarks Bookmark[]
+}
+
+model CodingProblem {
+  id          String     @id @default(uuid())
+  title       String
+  description String
+  difficulty  Difficulty
+  category    String
+  examples    Json?
+  constraints Json?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  bookmarks Bookmark[]
+}
+
+model Bookmark {
+  id              String   @id @default(uuid())
+  userId          String
+  noteId          String?
+  documentationId String?
+  problemId       String?
+  createdAt       DateTime @default(now())
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note          Note?          @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  documentation Documentation? @relation(fields: [documentationId], references: [id], onDelete: Cascade)
+  problem       CodingProblem? @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, noteId, documentationId, problemId])
+}
